@@ -6,6 +6,27 @@ from socket import SHUT_RDWR
 
 # Functions
 
+# Download
+def download(words):
+	dirContents = os.listdir(os.getcwd())
+	filename = words[1]
+	for i in dirContents: # loop over every file in the current dir
+		if(i==filename): # if there's a match
+			c.send("READY") # send "READY" to the client
+			listen = c.recv(16) # listen for a response
+			if(listen=="READY"): # if "READY" is received
+				print("Sending {0} to client").format(filename)
+				f = open(filename, 'rb') # open the file to be copied
+				f_data = f.read(1024) # read it and copy the data
+				f.close() # close the file
+				c.send(f_data) # send the data
+				print("data has been sent")
+			elif(listen=="STOP"): # otherwise, if "STOP", client wishes not to proceed
+				c.send("OK, Will not overwrite file") # send confirmation to client
+		else:
+			c.send("File not found")
+
+
 # Change Directory
 def cd(words):
 	print("Received CD command")
@@ -21,7 +42,7 @@ def cd(words):
 		except OSError as e: # catches if the path is invalid
 			print(e)
 			c.send(e)
-	
+
 
 try:
 	s = socket.socket()
@@ -53,22 +74,24 @@ while True:
 	data = c.recv(16)
 	words = data.split()
 
-	if(data=="BYE"):
+	if(words[0]=="BYE"):
 		print("Received BYE message")
 		s.shutdown(SHUT_RDWR)
 		s.close()
-	elif(data=="PWD"):
+	elif(words[0]=="PWD"):
 		print("Received PWD command")
 		currentDir = str(os.getcwd())
 		c.send(currentDir)
-	elif(data=="DIR"):
+	elif(words[0]=="DIR"):
 		print("Received DIR command")
-		dirContents = str(os.listdir(os.getcwd()))
-		c.send(dirContents)
+		dirContents = os.listdir(os.getcwd())
+		ppDirContents = ', '.join(dirContents)
+		c.send(ppDirContents)
 	elif(words[0]=="CD"):
 		cd(words)
-	elif(data=="DOWNLOAD"):
+	elif(words[0]=="DOWNLOAD"):
 		print("Received DOWNLOAD command")
+		download(words)
 	else:
 		print("Invalid command received")
 		c.send("Invalid Command")

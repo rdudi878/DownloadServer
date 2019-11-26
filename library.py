@@ -1,6 +1,6 @@
 # Download file
 def download():
-    
+
 
 # Return current directory
 def pwd(appType):
@@ -37,4 +37,3 @@ def dir(appType):
         dirContents = str(os.listdir(os.getcwd()))
         print(dirContents)
     if (appType=="server"):
-        
