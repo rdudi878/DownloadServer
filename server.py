@@ -1,11 +1,11 @@
 import sys
 import socket
 import os
+import library as lib
 from socket import SHUT_RDWR
 
 
 # Functions
-
 # Download
 def download(words):
 	dirContents = os.listdir(os.getcwd())
@@ -26,23 +26,25 @@ def download(words):
 		else:
 			c.send("File not found")
 
-
-# Change Directory
-def cd(words):
-	print("Received CD command")
-	if(len(words)<=1):
-		print("Error. CD requires 1 argument")
-	if(len(words)>1):
-		try:
-			path = words[1] # path is the second word in the list
-			os.chdir(path)
-			print("Changed directory to:")
-			print(os.getcwd())
-			c.send(str(os.getcwd()))
-		except OSError as e: # catches if the path is invalid
-			print(e)
-			c.send(e)
-
+# Download
+def download(words):
+	dirContents = os.listdir(os.getcwd())
+	filename = words[1]
+	for i in dirContents: # loop over every file in the current dir
+		if(i==filename): # if there's a match
+			c.send("READY") # send "READY" to the client
+			listen = c.recv(16) # listen for a response
+			if(listen=="READY"): # if "READY" is received
+				print("Sending {0} to client").format(filename)
+				f = open(filename, 'rb') # open the file to be copied
+				f_data = f.read(1024) # read it and copy the data
+				f.close() # close the file
+				c.send(f_data) # send the data
+				print("data has been sent")
+			elif(listen=="STOP"): # otherwise, if "STOP", client wishes not to proceed
+				c.send("OK, Will not overwrite file") # send confirmation to client
+		else:
+			c.send("File not found")
 
 try:
 	s = socket.socket()
@@ -80,15 +82,12 @@ while True:
 		s.close()
 	elif(words[0]=="PWD"):
 		print("Received PWD command")
-		currentDir = str(os.getcwd())
+		currentDir = lib.pwd("server")
 		c.send(currentDir)
 	elif(words[0]=="DIR"):
-		print("Received DIR command")
-		dirContents = os.listdir(os.getcwd())
-		ppDirContents = ', '.join(dirContents)
-		c.send(ppDirContents)
+		c.send(lib.dir("server"))
 	elif(words[0]=="CD"):
-		cd(words)
+		c.send(lib.cd(words, "server"))
 	elif(words[0]=="DOWNLOAD"):
 		print("Received DOWNLOAD command")
 		download(words)
