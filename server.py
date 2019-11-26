@@ -26,6 +26,25 @@ def download(words):
 		else:
 			c.send("File not found")
 
+# Download
+def download(words):
+	dirContents = os.listdir(os.getcwd())
+	filename = words[1]
+	for i in dirContents: # loop over every file in the current dir
+		if(i==filename): # if there's a match
+			c.send("READY") # send "READY" to the client
+			listen = c.recv(16) # listen for a response
+			if(listen=="READY"): # if "READY" is received
+				print("Sending {0} to client").format(filename)
+				f = open(filename, 'rb') # open the file to be copied
+				f_data = f.read(1024) # read it and copy the data
+				f.close() # close the file
+				c.send(f_data) # send the data
+				print("data has been sent")
+			elif(listen=="STOP"): # otherwise, if "STOP", client wishes not to proceed
+				c.send("OK, Will not overwrite file") # send confirmation to client
+		else:
+			c.send("File not found")
 
 try:
 	s = socket.socket()

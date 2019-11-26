@@ -1,11 +1,13 @@
 import sys
 import socket
 import os
+
 import library as lib
 
 if __name__ == '__main__':
 	protocol = sys.argv[1] # Protocol: TCP or UDP
 	host = '127.0.0.1'
+ 
 	if (protocol=='tcp'):
 		# AF_INET indicates IPV4. SOCK_STREAM indicates that this is a TCP socket
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

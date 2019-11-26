@@ -4,6 +4,7 @@ import os
 import library as lib
 from socket import SHUT_RDWR
 
+
 # Return current directory - LOOKS GOOD
 def pwd(appType):
     if (appType=="client"):
@@ -35,7 +36,8 @@ def dir(appType):
     dirContents = os.listdir(os.getcwd())
     ppDirContents = ', '.join(dirContents)
     if (appType=="client"):
-        print(ppDirContents)
+      print(ppDirContents)
     elif (appType=="server"):
-		print("Received DIR command")
-		return ppDirContents
+      print("Received DIR command")
+      return ppDirContents
+
