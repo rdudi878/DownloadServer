@@ -1,7 +1,6 @@
 # Download file
 def download():
 
-
 # Return current directory
 def pwd(appType):
     if (appType=="client"):
