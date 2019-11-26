@@ -1,8 +1,10 @@
-# Download file
-def download():
-    
+import sys
+import socket
+import os
+import library as lib
+from socket import SHUT_RDWR
 
-# Return current directory
+# Return current directory - LOOKS GOOD
 def pwd(appType):
     if (appType=="client"):
         print("Current dir on client: ")
@@ -10,9 +12,9 @@ def pwd(appType):
     if (appType=="server"):
         print("Current dir on server: ")
         currentDir = str(os.getcwd())
-        c.send(currentDir)
+        return currentDir
 
-# Change directory
+# Change directory - LOOKS GOOD
 def cd(words, appType):
     if (appType=="server"):
         print("Received CD command")
@@ -23,18 +25,17 @@ def cd(words, appType):
             path = words[1] # path to second word in list
             os.chdir(path)
             print("Changed directory to:")
-            print(os.getcwd())
-            if (appType=="server"):
-                c.send(str(os.getcwd()))
+            success = str(os.getcwd())
+            return success
         except OSError as e: # failsafe/catch for invalid path
-            print(e)
-            if (appType=="server"):
-                c.send(e)
+            return str(e)
 
-# Prints the contents of the current directory
+# Prints the contents of the current directory - LOOKS GOOD
 def dir(appType):
+    dirContents = os.listdir(os.getcwd())
+    ppDirContents = ', '.join(dirContents)
     if (appType=="client"):
-        dirContents = str(os.listdir(os.getcwd()))
-        print(dirContents)
-    if (appType=="server"):
-        
+        print(ppDirContents)
+    elif (appType=="server"):
+		print("Received DIR command")
+		return ppDirContents
